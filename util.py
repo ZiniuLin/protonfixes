@@ -683,3 +683,17 @@ def try_show_gui_error(text):
             subprocess.run(["notify-send", "protonfixes", text])
         except:
             log.info("Failed to show error message with the following text: {}".format(text))
+
+def is_intel_gpu():
+    render_node = "renderD129"
+    if not os.path.exists("/dev/dri/" + render_node):
+        render_node = "renderD128"
+    with open("/sys/class/drm/{}/device/uevent".format(render_node)) as file:
+        lines = file.readlines()
+        for line in lines:
+            if line.startswith("PCI_ID"):
+                content = line.split("=")[1]
+                vendor_id = content.split(":")[0]
+                if vendor_id == "8086":
+                    return True
+    return False
